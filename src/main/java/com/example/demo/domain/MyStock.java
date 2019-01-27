@@ -2,7 +2,7 @@ package com.example.demo.domain;
 
 import javax.persistence.*;
 import java.util.Date;
-@Entity(name="mystock")
+@Entity(name="up_stock")
 public class MyStock {
     @Id
     @GeneratedValue

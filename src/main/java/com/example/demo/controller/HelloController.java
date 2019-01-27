@@ -21,13 +21,18 @@ public class HelloController {
     MyStockRepository myStockRepository;
     @Autowired
     FiveTgbStockRepository fiveTgbStockRepository;
+    @RequestMapping("/f/{f}")
+    String e(@PathVariable("f")String f){
+        List<FiveTgbStock> stockList = fiveTgbStockRepository.findByDayFormatOrderByOpenBidRateDesc(f);
+        return "success<br>"+stockList;
+    }
     @RequestMapping("/d/{end}")
     String d(@PathVariable("end")String end){
 
         boolean f = true;
         while (f){
             System.out.println("==========["+end);
-            if(end.equals("2018-10-22")){
+            if(end.equals("20181220")){
                 f=false;
             }
             end=my(end);
@@ -35,9 +40,9 @@ public class HelloController {
         return "success<br>";
     }
     String my(String end){
-            Date endDate =  MyUtils.getFormatDateSys(end);
+            Date endDate =  MyUtils.getFormatDate(end);
          String myEnd = MyUtils.getDayFormat(endDate);
-         String start =MyUtils.getDayFormatSys(MyChineseWorkDay.preDaysWorkDay(4,endDate));
+         String start =MyUtils.getDayFormat(MyChineseWorkDay.preDaysWorkDay(4,endDate));
          System.out.println(start+":"+end+",my:"+myEnd);
          List<TotalStock> totalStocks =myStockRepository.fiveStock(start,end);
          for(TotalStock totalStock:totalStocks){
@@ -57,8 +62,8 @@ public class HelloController {
              fiveTgbStock.setDayFormat(myEnd);
              fiveTgbStockRepository.save(fiveTgbStock);
          }
-        endDate =  MyUtils.getFormatDateSys(end);
-        return MyUtils.getDayFormatSys(MyChineseWorkDay.preDaysWorkDay(1,endDate));
+        endDate =  MyUtils.getFormatDate(end);
+        return MyUtils.getDayFormat(MyChineseWorkDay.preDaysWorkDay(1,endDate));
      }
     @RequestMapping("/t/{end}")
     String t(@PathVariable("end")String end){
