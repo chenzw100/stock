@@ -1,10 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.dao.FiveTgbStockRepository;
-import com.example.demo.dao.MyStockRepository;
-import com.example.demo.domain.FiveTgbStock;
-import com.example.demo.domain.MyStock;
-import com.example.demo.domain.TotalStock;
+import com.example.demo.dao.*;
+import com.example.demo.domain.*;
+import com.example.demo.enums.NumberEnum;
 import com.example.demo.utils.MyChineseWorkDay;
 import com.example.demo.utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,27 @@ public class HelloController {
     MyStockRepository myStockRepository;
     @Autowired
     FiveTgbStockRepository fiveTgbStockRepository;
+    @Autowired
+    TemperatureRepository temperatureRepository;
+    @Autowired
+    DownStockRepository downStockRepository;
+    @Autowired
+    MyFiveTgbStockRepository myFiveTgbStockRepository;
+    @RequestMapping("/m/{end}")
+    String m(@PathVariable("end")String end) {
+        String desc ="查询20190124之后的数据，坚持模式！！！<br>查询日期";
+        Date endDate =  MyUtils.getFormatDate(end);
+        String yesterday =MyUtils.getDayFormat(MyChineseWorkDay.preDaysWorkDay(1,endDate));
+        List<Temperature> yesterdays = temperatureRepository.findByDayFormatAndType(yesterday, NumberEnum.TemperatureType.CLOSE.getCode());
+        List<DownStock> downStocks =downStockRepository.findByDayFormatOrderByOpenBidRate(end);
+
+        List<FiveTgbStock> hotSortFive = fiveTgbStockRepository.findByDayFormatOrderByOpenBidRateDesc(end);
+        List<MyFiveTgbStock> myTgbStockFive = myFiveTgbStockRepository.findByDayFormatOrderByOpenBidRateDesc(end);
+        List<Temperature> temperatures = temperatureRepository.findByDayFormatOrderByIdDesc(end);
+        List<DownStock> downBeforeStocks =downStockRepository.findByPreFormatOrderByOpenBidRateDesc(end);
+
+        return desc+end+"昨日情况:<br>"+downStocks+"<br>"+yesterdays+"<br>股吧竞价:<br>"+hotSortFive+"end"+end+"<br>我的竞价:<br>"+myTgbStockFive+":<br>"+temperatures+end+"当日:<br>"+downBeforeStocks;
+    }
     @RequestMapping("/f/{f}")
     String e(@PathVariable("f")String f){
         List<FiveTgbStock> stockList = fiveTgbStockRepository.findByDayFormatOrderByOpenBidRateDesc(f);
